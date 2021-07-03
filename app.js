@@ -4,11 +4,12 @@ const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 const Joi = require("joi");
 const { campgroundSchema } = require("./schemas");
-const methodOverride = require("method-override");
-const Campground = require("./models/campground");
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
-const { required } = require("joi");
+const methodOverride = require("method-override");
+// const { required } = require("joi");
+const Campground = require("./models/campground");
+const Review = require("./models/review");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
@@ -107,6 +108,19 @@ app.put(
     const campground = await Campground.findByIdAndUpdate(id, {
       ...req.body.campground,
     });
+    res.redirect(`/campgrounds/${campground._id}`);
+  })
+);
+
+// ? Reviews route
+app.post(
+  "/campgrounds/:id/reviews",
+  catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
   })
 );
