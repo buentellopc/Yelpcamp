@@ -35,10 +35,10 @@ app.use(methodOverride("_method"));
 const validateCampground = (req, res, next) => {
   const { error } = campgroundSchema.validate(req.body);
   // console.log(result);
-  console.log(error);
+  // console.log(error);
   if (error) {
-    console.log(error.details);
-    console.log(error.details[0].message);
+    // console.log(error.details);
+    // console.log(error.details[0].message);
     const msg = error.details[0].message;
     throw new ExpressError(msg, 400);
   } else {
@@ -47,13 +47,14 @@ const validateCampground = (req, res, next) => {
 };
 
 const validateReview = (req, res, next) => {
+  // console.log(req.body);
   const { error } = reviewSchema.validate(req.body);
-  const obj = reviewSchema.validate(req.body);
-  console.log("full object", obj);
-  console.log("error part", error);
+  // const obj = reviewSchema.validate(req.body);
+  // console.log("full object", obj);
+  // console.log("error part", error);
   if (error) {
     // console.log(error.details);
-    // console.log(error.details[0].message);
+    console.log(error.details[0].message);
     const msg = error.details[0].message;
     throw new ExpressError(msg, 400);
   } else {
@@ -101,7 +102,10 @@ app.post(
 app.get(
   "/campgrounds/:id",
   catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id).populate(
+      "reviews"
+    );
+    // console.log(campground);
     res.render("campgrounds/show", { campground });
   })
 );
@@ -114,6 +118,22 @@ app.get(
     res.render("campgrounds/edit", { campground });
   })
 );
+
+// Not important really, just some testing wih mongoose middleware
+// app.get(
+//   "/campgrounds/test/:id",
+//   catchAsync(async (req, res) => {
+//     console.log("test route reached");
+//     const { id } = req.params;
+//     const campground = await Campground.updateOne(
+//       { _id: id },
+//       {
+//         title: "lalalal",
+//       }
+//     );
+//     res.send("OK");
+//   })
+// );
 
 app.put(
   "/campgrounds/:id",
@@ -145,8 +165,21 @@ app.delete(
   "/campgrounds/:id",
   catchAsync(async (req, res) => {
     const { id } = req.params;
+    // Not Colt approach
+    // const deletedCampground = await Campground.findByIdAndDelete(id);
+    // await Review.deleteMany({ _id: { $in: deletedCampground.reviews } });
     await Campground.findByIdAndDelete(id);
     res.redirect("/campgrounds");
+  })
+);
+
+app.delete(
+  "/campgrounds/:id/reviews/:reviewId",
+  catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
   })
 );
 // app.get("/makecampgrounds", async (req, res) => {
