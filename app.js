@@ -11,6 +11,9 @@ const methodOverride = require("method-override");
 const Campground = require("./models/campground");
 const Review = require("./models/review");
 
+// routes
+const campgrounds = require("./routes/campgrounds");
+
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -32,20 +35,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  // console.log(result);
-  // console.log(error);
-  if (error) {
-    // console.log(error.details);
-    // console.log(error.details[0].message);
-    const msg = error.details[0].message;
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
-
 const validateReview = (req, res, next) => {
   // console.log(req.body);
   const { error } = reviewSchema.validate(req.body);
@@ -62,90 +51,8 @@ const validateReview = (req, res, next) => {
   }
 };
 
-app.get("/", (req, res) => {
-  res.render("home");
-});
-
-// ** ALL CAMPGROUNDS
-app.get(
-  "/campgrounds",
-  catchAsync(async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render("campgrounds/index", { campgrounds });
-  })
-);
-
-// ** CREATE A CAMPGROUND
-
-// SHOW A CAMPGROUND TO CREATE
-app.get("/campgrounds/new", (req, res) => {
-  res.render("campgrounds/new");
-});
-
-// POST TO HANDLE THE CREATION
-app.post(
-  "/campgrounds",
-  validateCampground,
-
-  catchAsync(async (req, res, next) => {
-    // if (!req.body.campground) {
-    //   throw new ExpressError("Invalid Campground Data (post)", 400);
-    // }
-
-    const campground = new Campground(req.body.campground);
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
-);
-
-// ** SPECIFIC CAMPGROUND (ID)
-app.get(
-  "/campgrounds/:id",
-  catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate(
-      "reviews"
-    );
-    // console.log(campground);
-    res.render("campgrounds/show", { campground });
-  })
-);
-
-// ** EDIT CAMPGROUND
-app.get(
-  "/campgrounds/:id/edit",
-  catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    res.render("campgrounds/edit", { campground });
-  })
-);
-
-// Not important really, just some testing wih mongoose middleware
-// app.get(
-//   "/campgrounds/test/:id",
-//   catchAsync(async (req, res) => {
-//     console.log("test route reached");
-//     const { id } = req.params;
-//     const campground = await Campground.updateOne(
-//       { _id: id },
-//       {
-//         title: "lalalal",
-//       }
-//     );
-//     res.send("OK");
-//   })
-// );
-
-app.put(
-  "/campgrounds/:id",
-  validateCampground,
-  catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, {
-      ...req.body.campground,
-    });
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
-);
+// routes
+app.use("/campgrounds", campgrounds);
 
 // ? Reviews route
 app.post(
