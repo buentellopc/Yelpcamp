@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
-const { campgroundSchema, reviewSchema } = require("../schemas");
+const { campgroundSchema } = require("../schemas");
 
 const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground");
@@ -98,6 +98,18 @@ router.put(
       ...req.body.campground,
     });
     res.redirect(`/campgrounds/${campground._id}`);
+  })
+);
+
+router.delete(
+  "/:id",
+  catchAsync(async (req, res) => {
+    const { id } = req.params;
+    // Not Colt approach
+    // const deletedCampground = await Campground.findByIdAndDelete(id);
+    // await Review.deleteMany({ _id: { $in: deletedCampground.reviews } });
+    await Campground.findByIdAndDelete(id);
+    res.redirect("/campgrounds");
   })
 );
 
