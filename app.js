@@ -11,6 +11,7 @@ mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
 });
 
 const db = mongoose.connection;
@@ -24,6 +25,8 @@ const app = express();
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
+app.use(express.static("public"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
