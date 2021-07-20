@@ -61,7 +61,7 @@ router.get(
       "reviews"
     );
     // console.log(campground);
-    res.render("campgrounds/show", { campground, msg: req.flash("success") });
+    res.render("campgrounds/show", { campground });
   })
 );
 
