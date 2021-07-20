@@ -48,6 +48,7 @@ router.post(
 
     const campground = new Campground(req.body.campground);
     await campground.save();
+    req.flash("success", "Succesfully created a campground!");
     res.redirect(`/campgrounds/${campground._id}`);
   })
 );
@@ -60,7 +61,7 @@ router.get(
       "reviews"
     );
     // console.log(campground);
-    res.render("campgrounds/show", { campground });
+    res.render("campgrounds/show", { campground, msg: req.flash("success") });
   })
 );
 
