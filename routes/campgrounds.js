@@ -98,6 +98,7 @@ router.put(
     const campground = await Campground.findByIdAndUpdate(id, {
       ...req.body.campground,
     });
+    req.flash("success", "Succesfully edited a campground!");
     res.redirect(`/campgrounds/${campground._id}`);
   })
 );
@@ -110,6 +111,7 @@ router.delete(
     // const deletedCampground = await Campground.findByIdAndDelete(id);
     // await Review.deleteMany({ _id: { $in: deletedCampground.reviews } });
     await Campground.findByIdAndDelete(id);
+    req.flash("success", "Succesfully deleted a campground!");
     res.redirect("/campgrounds");
   })
 );
