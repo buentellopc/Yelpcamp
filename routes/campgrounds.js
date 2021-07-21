@@ -60,7 +60,11 @@ router.get(
     const campground = await Campground.findById(req.params.id).populate(
       "reviews"
     );
-    // console.log(campground);
+    if (!campground) {
+      console.log(campground); // it logs null, so null.length would be an error
+      req.flash("error", "campground not found!");
+      return res.redirect("/campgrounds");
+    }
     res.render("campgrounds/show", { campground });
   })
 );
@@ -70,6 +74,11 @@ router.get(
   "/:id/edit",
   catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+      console.log(campground); // does not log anything
+      req.flash("error", "campground not found!");
+      return res.redirect("/campgrounds");
+    }
     res.render("campgrounds/edit", { campground });
   })
 );
