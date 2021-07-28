@@ -5,7 +5,7 @@ const { campgroundSchema } = require("../schemas");
 
 const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground");
-
+const { isLoggedIn } = require("../middleware");
 const validateCampground = (req, res, next) => {
   const { error } = campgroundSchema.validate(req.body);
   // console.log(result);
@@ -32,13 +32,14 @@ router.get(
 // ** CREATE A CAMPGROUND
 
 // SHOW A CAMPGROUND TO CREATE
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
   res.render("campgrounds/new");
 });
 
 // POST TO HANDLE THE CREATION
 router.post(
   "/",
+  isLoggedIn,
   validateCampground,
 
   catchAsync(async (req, res, next) => {
