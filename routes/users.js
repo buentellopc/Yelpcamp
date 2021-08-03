@@ -46,8 +46,10 @@ router.post(
     failureRedirect: "/login",
   }),
   (req, res) => {
+    const redirectUrl = req.session.returnTo || "/campgrounds";
+    delete req.session.returnTo;
     req.flash("success", "Welcome back!");
-    res.redirect("/campgrounds");
+    res.redirect(redirectUrl);
   }
 );
 
