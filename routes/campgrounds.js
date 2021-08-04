@@ -48,6 +48,7 @@ router.post(
     // }
 
     const campground = new Campground(req.body.campground);
+    campground.author = req.user._id;
     await campground.save();
     req.flash("success", "Succesfully created a campground!");
     res.redirect(`/campgrounds/${campground._id}`);
@@ -58,9 +59,10 @@ router.post(
 router.get(
   "/:id",
   catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate(
-      "reviews"
-    );
+    const campground = await Campground.findById(req.params.id)
+      .populate("reviews")
+      .populate("author");
+    console.log(campground);
     if (!campground) {
       console.log(campground); // it logs null, so null.length would be an error
       req.flash("error", "campground not found!");
