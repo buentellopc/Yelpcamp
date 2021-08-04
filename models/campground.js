@@ -4,6 +4,10 @@ const Review = require("./review");
 
 const CampgroundSchema = new Schema({
   title: String,
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
   price: Number,
   image: String,
   description: String,
