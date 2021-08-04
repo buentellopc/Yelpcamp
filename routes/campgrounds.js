@@ -1,24 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
-const { campgroundSchema } = require("../schemas");
 
-const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground");
-const { isLoggedIn } = require("../middleware");
-const validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
-  // console.log(result);
-  // console.log(error);
-  if (error) {
-    // console.log(error.details);
-    // console.log(error.details[0].message);
-    const msg = error.details[0].message;
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-};
+const { isLoggedIn, isAuthor, validateCampground } = require("../middleware");
 
 // ** ALL CAMPGROUNDS
 router.get(
@@ -75,6 +60,8 @@ router.get(
 // ** EDIT CAMPGROUND
 router.get(
   "/:id/edit",
+  isLoggedIn,
+  isAuthor,
   catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     if (!campground) {
@@ -104,6 +91,7 @@ router.get(
 
 router.put(
   "/:id",
+  isAuthor,
   validateCampground,
   catchAsync(async (req, res) => {
     const { id } = req.params;
@@ -117,6 +105,7 @@ router.put(
 
 router.delete(
   "/:id",
+  isAuthor,
   catchAsync(async (req, res) => {
     const { id } = req.params;
     // Not Colt approach
