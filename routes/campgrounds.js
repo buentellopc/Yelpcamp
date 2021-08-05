@@ -47,7 +47,7 @@ router.get(
     const campground = await Campground.findById(req.params.id)
       .populate("reviews")
       .populate("author");
-    console.log(campground);
+    //console.log(campground);
     if (!campground) {
       console.log(campground); // it logs null, so null.length would be an error
       req.flash("error", "campground not found!");

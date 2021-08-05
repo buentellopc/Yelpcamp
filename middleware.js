@@ -14,7 +14,7 @@ module.exports.isLoggedIn = (req, res, next) => {
 module.exports.isAuthor = async (req, res, next) => {
   const { id } = req.params;
   const campground = await Campground.findById(id).populate("author");
-  console.log("author", campground.author);
+  //  console.log("author", campground.author);
   if (!campground.author.equals(req.user)) {
     req.flash("error", "You do not have permission!");
     return res.redirect(`/campgrounds/${id}`);
