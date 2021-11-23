@@ -9,11 +9,14 @@ const { isLoggedIn, isAuthor, validateCampground } = require("../middleware");
 router
   .route("/")
   .get(catchAsync(campgrounds.index))
-  .post(
-    isLoggedIn,
-    validateCampground,
-    catchAsync(campgrounds.createCamgpround)
-  );
+  // .post(
+  //   isLoggedIn,
+  //   validateCampground,
+  //   catchAsync(campgrounds.createCamgpround)
+  // );
+  .post((req, res) => {
+    res.send(req.body);
+  });
 
 router.get("/new", isLoggedIn, campgrounds.renderNewForm);
 

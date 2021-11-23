@@ -85,6 +85,9 @@ app.get("/fakeUser", async (req, res) => {
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/reviews", reviewRoutes);
 app.use("/", userRoutes);
+app.use("/", (req, res) => {
+  res.render("home");
+});
 
 // app.get("/makecampgrounds", async (req, res) => {
 //   const camp = new Campground({
