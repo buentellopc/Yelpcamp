@@ -11,28 +11,38 @@ ImageSchema.virtual("thumbnail").get(function () {
   return this.url.replace("/upload", "/upload/w_200");
 });
 
-const CampgroundSchema = new Schema({
-  title: String,
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
-  price: Number,
-  images: [ImageSchema],
-  geometry: {
-    type: {
-      type: String, // Don't do `{ location: { type: String } }`
-      enum: ["Point"], // 'location.type' must be 'Point'
-      required: true,
+const opts = { toJSON: { virtuals: true } };
+
+const CampgroundSchema = new Schema(
+  {
+    title: String,
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
-    coordinates: {
-      type: [Number],
-      required: true,
+    price: Number,
+    images: [ImageSchema],
+    geometry: {
+      type: {
+        type: String, // Don't do `{ location: { type: String } }`
+        enum: ["Point"], // 'location.type' must be 'Point'
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
+    description: String,
+    location: String,
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   },
-  description: String,
-  location: String,
-  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+  opts
+);
+
+CampgroundSchema.virtual("properties.popUpMarkup").get(function () {
+  return `<strong><a href="/campgrounds/${this._id}">${this.title}</a></strong>
+  <p>${this.description.substring(0, 20)}...</p>`;
 });
 
 // The route was using a method that belongs to a Model and returns a Query, probably that is why nothing whas shown here
