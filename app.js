@@ -11,6 +11,7 @@ const flash = require("connect-flash");
 const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
 const passport = require("passport");
+const mongoSanitize = require("express-mongo-sanitize");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
 
@@ -43,6 +44,7 @@ app.set("public", path.join(__dirname, "public"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(mongoSanitize());
 
 const sessionConfig = {
   httpOnly: true,
@@ -67,6 +69,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+  console.log(req.query);
   // console.log(req.session);
   if (!["/", "/login"].includes(req.originalUrl)) {
     req.session.returnTo = req.originalUrl;
